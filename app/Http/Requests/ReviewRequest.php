@@ -28,6 +28,7 @@ class ReviewRequest extends FormRequest
             'title' => 'required|max:50',
             'body' => 'required|max:500',
             // 'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'tags' => 'json|regex:/^(?!.*\s).+$/u|regex:/^(?!.*\/).*$/u',
 
         ];
     }
@@ -38,6 +39,18 @@ class ReviewRequest extends FormRequest
             'title' => 'タイトル',
             'body' => '本文',
             'image' => '画像',
+            'tags' => 'タグ',
+
         ];
     }
+
+    public function passedValidation()
+    {
+        $this->tags = collect(json_decode($this->tags))
+            ->slice(0, 5)
+            ->map(function ($requestTag) {
+                return $requestTag->text;
+            });
+    }
+
 }

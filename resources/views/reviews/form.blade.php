@@ -4,7 +4,14 @@
         <div class="form-group">
         <label>本のタイトル</label>
         <input type="text" name="title" class="form-control" value="{{ $review->title ?? old('title') }}">
-
+        </div>
+        <div class="form-group">
+          <review-tags-input
+          :initial-tags='@json($tagNames ?? [])'
+          :autocomplete-items='@json($allTagNames ?? [])'
+    
+          >
+          </review-tags-input>
         </div>
         <div class="form-group">
         <label>レビュー本文</label>

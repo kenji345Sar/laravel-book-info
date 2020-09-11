@@ -30,5 +30,12 @@ Route::get('/', 'ReviewController@index')->name('reviews.index');
 Route::resource('/reviews', 'ReviewController')->except(['index', 'show'])->middleware('auth'); //-- exceptメソッドの引数を変更
 Route::resource('/reviews', 'ReviewController')->only(['show']);
 
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::put('/{review}/like', 'ReviewController@like')->name('like')->middleware('auth');
+    Route::delete('/{review}/like', 'ReviewController@unlike')->name('unlike')->middleware('auth');
+});
+
+Route::get('/tags/{name}', 'TagController@show')->name('tags.show');
+
 
 Route::get('/home', 'HomeController@index')->name('home');

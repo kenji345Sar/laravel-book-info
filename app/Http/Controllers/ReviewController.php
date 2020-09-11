@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ReviewRequest;
 
 use App\Review;
+use App\Tag;
 
 
 class ReviewController extends Controller
@@ -38,7 +39,14 @@ class ReviewController extends Controller
 
     public function create()
     {
-        return view('reviews.review');
+
+        $allTagNames = Tag::all()->map(function ($tag) {
+            return ['text' => $tag->name];
+        });
+
+        return view('reviews.create', [
+            'allTagNames' => $allTagNames,
+        ]);
     }
 
     public function store(ReviewRequest $request, Review $review)
@@ -53,6 +61,12 @@ class ReviewController extends Controller
         }
 
         $review->save();
+
+        $request->tags->each(function ($tagName) use ($review) {
+            $tag = Tag::firstOrCreate(['name' => $tagName]);
+            $review->tags()->attach($tag);
+        });
+
         return redirect()->route('reviews.index');
     }
     // public function store(Request $request)
@@ -81,13 +95,32 @@ class ReviewController extends Controller
 
     public function edit(Review $review)
     {
-        return view('reviews.edit', ['review' => $review]);
+        $tagNames = $review->tags->map(function ($tag) {
+            return ['text' => $tag->name];
+        });
+
+        $allTagNames = Tag::all()->map(function ($tag) {
+            return ['text' => $tag->name];
+        });
+
+        return view('reviews.edit', [
+            'review' => $review,
+            'tagNames' => $tagNames,
+            'allTagNames' => $allTagNames,
+        ]);
+
     }
 
     public function update(ReviewRequest $request, Review $review)
     {
 
         $review->fill($request->all())->save();
+
+        $review->tags()->detach();
+        $request->tags->each(function ($tagName) use ($review) {
+            $tag = Tag::firstOrCreate(['name' => $tagName]);
+            $review->tags()->attach($tag);
+        });
 
         return redirect()->route('reviews.index');
     }
@@ -97,6 +130,27 @@ class ReviewController extends Controller
     {
         $review->delete();
         return redirect()->route('reviews.index');
+    }
+
+    public function like(Request $request, Review $review)
+    {
+        $review->likes()->detach($request->user()->id);
+        $review->likes()->attach($request->user()->id);
+
+        return [
+            'id' => $review->id,
+            'countLikes' => $review->count_likes,
+        ];
+    }
+
+    public function unlike(Request $request, Review $review)
+    {
+        $review->likes()->detach($request->user()->id);
+
+        return [
+            'id' => $review->id,
+            'countLikes' => $review->count_likes,
+        ];
     }
 
 }

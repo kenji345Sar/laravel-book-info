@@ -7,11 +7,13 @@
 // require('./bootstrap');
 
 
-window.Vue = require('vue');
+// window.Vue = require('vue');
 
 import './bootstrap'
 import Vue from 'vue'
 import ReviewLike from './components/ReviewLike'
+import ReviewTagsInput from './components/ReviewTagsInput'
+
 
 /**
  * The following block of code may be used to automatically register your
@@ -36,5 +38,6 @@ const app = new Vue({
     el: '#app',
     components: {
         ReviewLike,
+        ReviewTagsInput
     }
 });
