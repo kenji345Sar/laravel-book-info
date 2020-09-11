@@ -13,16 +13,22 @@
 
 Auth::routes();
 
-Route::get('/' , 'ReviewController@index')->name('index');
+Route::get('/' , 'ReviewController@index')->name('reviews.index');
 
-Route::get('/show/{id}', 'ReviewController@show')->name('show');
+// Route::get('/show/{id}', 'ReviewController@show')->name('show');
 
-// ログインしている人だけがアクセスできるルーティンググループ
-Route::group(['middleware' => 'auth'], function () {
-    Route::get('/review', 'ReviewController@create')->name('create');
-    Route::post('/review/store', 'ReviewController@store')->name('store');
+// // ログインしている人だけがアクセスできるルーティンググループ
+// Route::group(['middleware' => 'auth'], function () {
+//     Route::get('/review', 'ReviewController@create')->name('create');
+//     Route::post('/review/store', 'ReviewController@store')->name('store');
 
-});
+// });
+
+// Route::resource('/reviews', 'ReviewController')->except(['index','show','store','create']);
+
+Route::get('/', 'ReviewController@index')->name('reviews.index');
+Route::resource('/reviews', 'ReviewController')->except(['index', 'show'])->middleware('auth'); //-- exceptメソッドの引数を変更
+Route::resource('/reviews', 'ReviewController')->only(['show']);
 
 
 Route::get('/home', 'HomeController@index')->name('home');
